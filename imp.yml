@@ -1,39 +1,44 @@
-activemq:
-  image: motech/activemq:5.5.1
-  ports:
-    - 61616:61616
-    - 8161:8161
-couchdb:
-  image: motech/couchdb:1.5.0
-  ports:
-    - 5984:5984
-    - 5985:5985
-db:
-  image: motech/mysql
-  ports:
-    - 3306:3306
-#  volumes:
-#    - /mysql:/var/lib/mysql
-  environment:
-    MYSQL_ROOT_PASSWORD: password
-    MYSQL_USER: quartz
-    MYSQL_PASSWORD: quartz2123
-    MYSQL_DATABASE: motechquartz
-tomcat:
-  image: motech/motech:war
-  ports:
-    - "8080:8080"
-    - "8000:8000"
-  links:
-    - couchdb
-    - db
-    - activemq
-  environment:
-    JAVA_OPTS: -Xms1024m -Xmx2048m -XX:MaxPermSize=1024m
-    HOME: /root
-    USER: root
-    DB_TYPE: mysql
-    DB_USER: root
-    DB_PASSWORD: password
-    DB_DRIVER: com.mysql.jdbc.Driver
-    MOTECH_VERSION: 0.28
+version: '3.8'
+services:
+  activemq:
+    image: motech/activemq:5.5.1
+    ports:
+      - 61616:61616
+      - 8161:8161
+  couchdb:
+    image: motech/couchdb:1.5.0
+    ports:
+      - 5984:5984
+      - 5985:5985
+  db:
+    image: motech/mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: quartz
+      MYSQL_PASSWORD: quartz2123
+      MYSQL_DATABASE: motechquartz
+  tomcat:
+    image: motech/motech:war
+    ports:
+      - "8080:8080"
+      - "8000:8000"
+    links:
+      - couchdb
+      - db
+      - activemq
+    environment:
+      JAVA_OPTS: -Xms1024m -Xmx2048m -XX:MaxPermSize=1024m
+      JAVA_HOME: /usr/lib/jvm/java-8-oracle
+      HOME: /root
+      USER: root
+      DB_TYPE: mysql
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_DRIVER: com.mysql.jdbc.Driver
+      MOTECH_VERSION: 0.28
+volumes:
+  mysql_data:
